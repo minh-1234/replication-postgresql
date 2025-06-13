@@ -1,0 +1,41 @@
+version: '3.1'
+services:
+  postgres-primary:
+    container_name: postgres-primary
+    image: postgres:15.0
+    environment:
+      POSTGRES_USER: "postgresadmin"
+      POSTGRES_PASSWORD: "admin123"
+      POSTGRES_DB: "postgresdb"
+      PGDATA: "/data"
+    volumes:
+      - ./postgres-primary/pgdata:/data
+      - ./postgres-primary/config:/config
+      - ./postgres-primary/archive:/mnt/server/archive
+    command: ["postgres", "-c", "config_file=/config/postgresql.conf"]
+    ports:
+      - 5000:5432
+    networks:
+      - postgres-network
+  
+  postgres-slave:
+    container_name: postgres-slave
+    image: postgres:15.0
+    environment:
+      POSTGRES_USER: "postgresadmin"
+      POSTGRES_PASSWORD: "admin123"
+      POSTGRES_DB: "postgresdb"
+      PGDATA: "/data"
+    volumes:
+      - ./postgres-slave/pgdata:/data
+      - ./postgres-slave/config:/config
+      - ./postgres-slave/archive:/mnt/server/archive
+    command: ["postgres", "-c", "config_file=/config/postgresql.conf"]
+    ports:
+      - 5001:5432
+    networks:
+      - postgres-network
+      
+networks:
+  postgres-network: 
+    driver: bridge
